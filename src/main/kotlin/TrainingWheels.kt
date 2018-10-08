@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
 // create app class; contains main starting view and any stylesheets (not used here)
 class TrainingWheelsApp : App(MainView::class)
 
-// a view is what is displayed in the window. To add visuals, orverride and change/add items to the root
+// a view is what is displayed in the window. To add visuals, override and change/add items to the root
 class MainView : View() {
 
     val image = Image("/Burrito-icon.png") // can read any file in the resources file
@@ -36,8 +36,8 @@ class MainView : View() {
 
                 /**
                  * binding sets the bound property value to another. In this case
-                 * the x and y coordiantes (top left hand corner of the imageview) are
-                 * being bound so that the image view is alwys in the center of the window,
+                 * the x and y coordinates (top left hand corner of the imageview) are
+                 * being bound so that the image view is always in the center of the window,
                  * no matter what the size of the window is and even changes as the window
                  * size changes
                  */
