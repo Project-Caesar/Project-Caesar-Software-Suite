@@ -16,7 +16,7 @@ class TrainingWheelsApp : App(MainView::class)
 // a view is what is displayed in the window. To add visuals, override and change/add items to the root
 class MainView : View() {
 
-    val image = Image("/Burrito-icon.png") // can read any file in the resources file
+    val image = Image("/Circle-icon.png") // can read any file in the resources file
 
     // set the root as a basic Pane()
     override val root = Pane()
