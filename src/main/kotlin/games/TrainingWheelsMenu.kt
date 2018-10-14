@@ -1,10 +1,13 @@
 package games
 
+import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.image.Image
 import javafx.scene.input.KeyCombination
-import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import tornadofx.*
+import java.io.File
 
 fun main(args: Array<String>) {
     launch<TrainingWheelsApp>(args)
@@ -23,12 +26,13 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
 }
 class TrainingWheelsMenu : View() {
 
+    private val selectedIconPreview = SimpleObjectProperty<Image>()
 
-    override val root = BorderPane()
+    override val root = HBox()
 
     init {
         with(root) {
-            left {
+            vbox {
                 button("Select Icon") {
                     setOnAction {
                         val fileChooser = FileChooser()
@@ -41,7 +45,12 @@ class TrainingWheelsMenu : View() {
                         fileChooser.extensionFilters += imageFilter
                         val file = fileChooser.showOpenDialog(null)
                         println(file)
+                        selectedIconPreview.value = Image(file.toURI().toString())
                     }
+                }
+
+                imageview {
+                    imageProperty().bind(selectedIconPreview)
                 }
             }
         }
