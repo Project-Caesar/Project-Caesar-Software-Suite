@@ -1,15 +1,19 @@
 # Project-Caesar-Software-Suite
 
-Developer Install steps:
-    1. Install Intellij Idea
-    2. Create a new project from GIT
-    3. Clone Project Caesar
-    4. Install jdk
-    5. Install openjfx
-    6. In intellij
-	    A. File->project structure->select JDK
-	    B. Initialize gradle tab
-	    C. Refresh gradle
-	    D. Restart intellij
-    7. Setup should be complete
-    8. Build and run program
+ Developer Install steps:
+    <ol>
+        <li>Install Intellij Idea</li>
+        <li>Create a new project from GIT</li>
+        <li>Clone Project Caesar</li>
+        <li>Install jdk</li>
+        <li>Install openjfx</li>
+        <li>In intellij</li>
+            <ol type="A">
+                <li>File -> project structure -> select JDK</li>
+                <li>Initialize gradle tab</li>
+                <li>Refresh gradle</li>
+                <li>Restart intellij</li>
+            </ol>
+        <li>Setup should be complete</li>
+        <li>Build and run program</li>
+    </ol>
