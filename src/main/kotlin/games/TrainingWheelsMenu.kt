@@ -1,9 +1,14 @@
 package games
 
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCombination
 import javafx.scene.layout.HBox
+import javafx.scene.text.Font
+import javafx.scene.text.FontWeight
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import tornadofx.*
@@ -25,6 +30,7 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
         stage.fullScreenExitKeyCombination = KeyCombination.NO_MATCH
     }
 }
+
 class TrainingWheelsMenu : View() {
 
     // used to select an icon file from a directory
@@ -32,10 +38,15 @@ class TrainingWheelsMenu : View() {
     // used to store selected image
     private val selectedIconPreview = SimpleObjectProperty<Image>()
 
+    private val iconShrinkRate = SimpleIntegerProperty(1)
+    private val iconShrinkLimit = SimpleDoubleProperty(.10)
+
     override val root = HBox()
 
     init {
         with(root) {
+            alignment = Pos.CENTER
+
             vbox {
                 button("Select Icon") {
                     setOnAction {
@@ -74,6 +85,70 @@ class TrainingWheelsMenu : View() {
                             fitHeight = 100.0
                             fitWidth = (fitHeight / image.height) * image.width
                         }
+                    }
+                }
+            }
+
+            vbox {
+                /**
+                 * Need to be able to set number of successes until shrink, and at which size it starts moving
+                 */
+
+                textfield {
+                    alignment = Pos.CENTER_RIGHT
+                    text = "1"
+
+                    textProperty().onChange {
+                        if (it == null) {
+                            iconShrinkRate.set(1)
+                        } else {
+                            it.trim()
+                            if (it.isInt() && it.toInt() >= 1) {
+                                iconShrinkRate.set(it.toInt())
+                            } else {
+                                iconShrinkRate.set(1)
+                            }
+                        }
+                    }
+
+                    focusedProperty().onChange {
+                        if (!it) {
+                            text = iconShrinkRate.value.toString()
+                        }
+                    }
+                }
+
+                hbox {
+                    textfield {
+                        alignment = Pos.CENTER_RIGHT
+                        text = "10"
+                        textProperty().onChange {
+                            if (it == null) {
+                                iconShrinkLimit.set(0.1)
+                            } else {
+                                it.trim()
+                                if (it.isDouble() && it.toDouble() > 10) {
+                                    if (it.toDouble() > 75) {
+                                        iconShrinkLimit.set(.75)
+                                    } else {
+                                        iconShrinkLimit.set(it.toDouble() / 100)
+                                    }
+                                } else {
+                                    iconShrinkLimit.set(0.1)
+                                }
+                            }
+                        }
+
+                        focusedProperty().onChange {
+                            if (!it) {
+                                text = (iconShrinkLimit.value * 100).toString()
+                            }
+                        }
+                    }
+
+                    text {
+                        text = "%"
+                        font = Font.font(font.family, 24.0)
                     }
                 }
             }
