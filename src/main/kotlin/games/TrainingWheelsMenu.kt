@@ -1,9 +1,5 @@
 package games
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCombination
@@ -25,7 +21,7 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
     // Start application at fullscreen
     override fun start(stage: Stage) {
         super.start(stage)
-        //stage.isFullScreen = true
+        stage.isFullScreen = true
         stage.fullScreenExitHint = ""
         stage.fullScreenExitKeyCombination = KeyCombination.NO_MATCH
     }
@@ -33,44 +29,26 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
 
 class TrainingWheelsMenu : View() {
 
+    val trainingWheelsScope = Scope()
+    val viewModel = TrainingWheelsViewModel()
+
     // used to select an icon file from a directory
     private val fileChooser = FileChooser()
-    // used to store selected image
-    private val selectedIconPreview = SimpleObjectProperty<Image>()
-
-    private val iconClicksToShrink = SimpleIntegerProperty(1)
-    private val iconShrinkLimit = SimpleDoubleProperty(.1)
-    private val iconStartSize = SimpleDoubleProperty(.9)
 
 
-    //private val iconShrinkRatio = SimpleDoubleProperty(.9)
-
-    private val readyToStart = SimpleBooleanProperty(true)
 
     override val root = VBox()
 
     init {
 
-        iconShrinkLimit.onChange {
-            if (it > iconStartSize.value) {
-                readyToStart.set(false)
-            } else {
-                readyToStart.set(true)
-            }
-        }
-
-        iconStartSize.onChange {
-            if (it < iconShrinkLimit.value) {
-                readyToStart.set(false)
-            } else {
-                readyToStart.set(true)
-            }
-        }
+        setInScope(viewModel, trainingWheelsScope)
 
         with(root) {
             alignment = Pos.CENTER
 
             hbox {
+
+                alignment = Pos.CENTER
 
                 vbox {
                     button("Select Icon") {
@@ -91,15 +69,15 @@ class TrainingWheelsMenu : View() {
                             fileChooser.extensionFilters += imageFilter
                             val file = fileChooser.showOpenDialog(null)
                             if (file != null) {
-                                println(file)
-                                selectedIconPreview.value = Image(file.toURI().toString())
+                                //println(file)
+                                viewModel.selectedIconPreview.value = Image(file.toURI().toString())
                             }
                         }
                     }
 
                     imageview {
                         // the imageview image will always be what is stored in the simple image property
-                        imageProperty().bind(selectedIconPreview)
+                        imageProperty().bind(viewModel.selectedIconPreview)
 
                         // basic image dimensions when one is selected
                         imageProperty().onChange {
@@ -127,20 +105,20 @@ class TrainingWheelsMenu : View() {
 
                             textProperty().onChange {
                                 if (it == null) {
-                                    iconClicksToShrink.set(1)
+                                    viewModel.iconClicksToShrink.set(1)
                                 } else {
                                     it.trim()
                                     if (it.isInt() && it.toInt() >= 1) {
-                                        iconClicksToShrink.set(it.toInt())
+                                        viewModel.iconClicksToShrink.set(it.toInt())
                                     } else {
-                                        iconClicksToShrink.set(1)
+                                        viewModel.iconClicksToShrink.set(1)
                                     }
                                 }
                             }
 
                             focusedProperty().onChange {
                                 if (!it) {
-                                    text = iconClicksToShrink.value.toString()
+                                    text = viewModel.iconClicksToShrink.value.toString()
                                 }
                             }
                         }
@@ -148,14 +126,14 @@ class TrainingWheelsMenu : View() {
 
                     this += PercentInputField(
                             "Starting Icon Size relative to Screen",
-                            iconStartSize,
-                            iconStartSize.value,
+                            viewModel.iconStartSize,
+                            viewModel.iconStartSize.value,
                             .1
                     )
                     this += PercentInputField(
                             "Smallest Icon Size relative to Screen",
-                            iconShrinkLimit,
-                            iconShrinkLimit.value,
+                            viewModel.iconShrinkLimit,
+                            viewModel.iconShrinkLimit.value,
                             .1
                     )
                 }
@@ -163,7 +141,10 @@ class TrainingWheelsMenu : View() {
             }
 
             button("START") {
-                disableProperty().bind(!readyToStart)
+                disableProperty().bind(!viewModel.readyToStart)
+                action {
+                    replaceWith(find<TrainingWheels>(trainingWheelsScope))
+                }
             }
         }
     }

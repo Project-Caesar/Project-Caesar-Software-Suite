@@ -31,14 +31,15 @@ class PercentInputField (
                         input.set(default)
                     } else {
                         it.trim()
-                        if (it.isDouble() && it.toDouble() > minimum) {
-                            if (it.toDouble() > maximum) {
+                        if (it.isDouble() && it.toDouble() / 100 > minimum) {
+                            if (it.toDouble() / 100 > maximum) {
+                                println(it)
                                 input.set(maximum)
                             } else {
                                 input.set(it.toDouble() / 100)
                             }
                         } else {
-                            input.set(0.1)
+                            input.set(default)
                         }
                     }
                 }

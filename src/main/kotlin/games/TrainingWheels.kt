@@ -1,18 +1,18 @@
 package games
 
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.InputEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.input.TouchEvent
 import javafx.scene.layout.Pane
-import tornadofx.*
-import java.io.File
 import java.util.concurrent.ThreadLocalRandom
+import tornadofx.*
 
-class TrainingWheels(imageFile : String, val shrinkLimit : Double = .10, val shrinkRate : Int = 1) : View() {
+class TrainingWheels : View() {
 
-    private val image = Image(File(imageFile).toURI().toString())
+
+    val viewModel : TrainingWheelsViewModel by inject()
+
     private var successCount = 0
     private var selectCount = 0
 
@@ -25,7 +25,7 @@ class TrainingWheels(imageFile : String, val shrinkLimit : Double = .10, val shr
         with(root) {
 
             // creates and adds the imageview object to root
-            imageview(image) {
+            imageview(viewModel.selectedIconPreview.value) {
                 preserveRatioProperty().value = true
 
                 /**
@@ -41,13 +41,21 @@ class TrainingWheels(imageFile : String, val shrinkLimit : Double = .10, val shr
                 // this is just setting the starting size of the image based on the starting
                 // window size
 
-                widthProperty().onChangeOnce {
+                heightProperty().onChangeOnce {
                     if (image.width >= image.height) {
-                        fitWidth = root.width * .9
+                        fitWidth = root.width * viewModel.iconStartSize.value
                         fitHeight = (fitWidth / image.width) * image.height
+                        if (fitHeight > root.height) {
+                            fitHeight = root.height * viewModel.iconStartSize.value
+                            fitWidth = (fitHeight / image.height) * image.width
+                        }
                     } else {
-                        fitHeight = root.height * .9
+                        fitHeight = root.height * viewModel.iconStartSize.value
                         fitWidth = (fitHeight / image.height) * image.width
+                        if (fitWidth > root.width) {
+                            fitWidth = root.width * viewModel.iconStartSize.value
+                            fitHeight = (fitWidth / image.width) * image.height
+                        }
                     }
                 }
 
@@ -73,7 +81,7 @@ class TrainingWheels(imageFile : String, val shrinkLimit : Double = .10, val shr
 
     // This function either shrinks or moves the imageview around the screen
     private fun targetSelected(target : ImageView) {
-        if (target.fitHeight < root.height * shrinkLimit) {
+        if (target.fitHeight < root.height * viewModel.iconShrinkLimit.value) {
             target.xProperty().unbind()
             target.yProperty().unbind()
 
@@ -83,9 +91,9 @@ class TrainingWheels(imageFile : String, val shrinkLimit : Double = .10, val shr
             target.x = ThreadLocalRandom.current().nextInt((root.width - target.fitWidth).toInt()).toDouble()
             target.y = ThreadLocalRandom.current().nextInt((root.height - target.fitHeight).toInt()).toDouble()
         } else {
-            if (successCount % shrinkRate == 0) {
-                target.fitWidth = target.fitWidth * 0.9
-                target.fitHeight = target.fitHeight * 0.9
+            if (successCount % viewModel.iconClicksToShrink.value == 0) {
+                target.fitWidth = target.fitWidth * viewModel.iconShrinkRatio.value
+                target.fitHeight = target.fitHeight * viewModel.iconShrinkRatio.value
             }
         }
         //println("${target.fitWidth} ${target.fitHeight} ${target.x} ${target.y} ${root.width} ${root.height}")

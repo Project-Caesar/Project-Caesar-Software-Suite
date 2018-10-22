@@ -33,7 +33,7 @@ class MainView : View() {
     val image = Image("/Circle-icon.png") // can read any file in the resources file
 
     // set the root as a basic Pane() and pass in specific icon
-    override val root = TrainingWheels("/Users/cbenedick/IdeaProjects/Project-Caesar-Software-Suite/src/main/resources/Circle-icon.png").root
+    override val root = TrainingWheels().root
 /*
     init {
         // This just sets up the root as part of the initialization of MainView. Otherwise, just
