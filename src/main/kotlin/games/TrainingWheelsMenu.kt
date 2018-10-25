@@ -8,6 +8,7 @@ import javafx.stage.FileChooser
 import javafx.stage.Stage
 import tornadofx.*
 import widgets.PercentInputField
+import VirtualKeyboard
 
 // main and app used to test the menu
 // will be removed when menu is complete
@@ -29,8 +30,8 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
 
 class TrainingWheelsMenu : View() {
 
-    val trainingWheelsScope = Scope()
-    val viewModel = TrainingWheelsViewModel()
+    private val trainingWheelsScope = Scope()
+    private val viewModel = TrainingWheelsViewModel()
 
     // used to select an icon file from a directory
     private val fileChooser = FileChooser()
@@ -52,6 +53,14 @@ class TrainingWheelsMenu : View() {
 
                 vbox {
                     button("Select Icon") {
+
+                        val imageFilter = FileChooser.ExtensionFilter(
+                                "Select Icon",
+                                listOf("*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif")
+                        )
+
+                        fileChooser.extensionFilters += imageFilter
+
                         setOnAction {
                             /**
                              * when clicked/touched, add an image file extension filter to the
@@ -61,15 +70,9 @@ class TrainingWheelsMenu : View() {
                              * simple image property
                              */
 
-                            val imageFilter = FileChooser.ExtensionFilter(
-                                    "Select Icon",
-                                    listOf("*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif")
-                            )
 
-                            fileChooser.extensionFilters += imageFilter
                             val file = fileChooser.showOpenDialog(null)
                             if (file != null) {
-                                //println(file)
                                 viewModel.selectedIconPreview.value = Image(file.toURI().toString())
                             }
                         }
@@ -128,13 +131,13 @@ class TrainingWheelsMenu : View() {
                             "Starting Icon Size relative to Screen",
                             viewModel.iconStartSize,
                             viewModel.iconStartSize.value,
-                            .1
+                            .3
                     )
                     this += PercentInputField(
                             "Smallest Icon Size relative to Screen",
                             viewModel.iconShrinkLimit,
                             viewModel.iconShrinkLimit.value,
-                            .1
+                            .3
                     )
                 }
 
@@ -146,6 +149,8 @@ class TrainingWheelsMenu : View() {
                     replaceWith(find<TrainingWheels>(trainingWheelsScope))
                 }
             }
+
+            this += VirtualKeyboard().view()
         }
     }
 }

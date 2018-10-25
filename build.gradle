@@ -4,6 +4,20 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.51'
 }
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'demos.MainKt'
+    }
+
+    baseName = project.name + '-all_2'
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+}
+
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -25,4 +39,9 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin/'
+    test.java.srcDirs += 'src/test/kotlin/'
 }
