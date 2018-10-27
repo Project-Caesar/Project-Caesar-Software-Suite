@@ -131,13 +131,13 @@ class TrainingWheelsMenu : View() {
                             "Starting Icon Size relative to Screen",
                             viewModel.iconStartSize,
                             viewModel.iconStartSize.value,
-                            .3
+                            .1
                     )
                     this += PercentInputField(
                             "Smallest Icon Size relative to Screen",
                             viewModel.iconShrinkLimit,
                             viewModel.iconShrinkLimit.value,
-                            .3
+                            .1
                     )
                 }
 

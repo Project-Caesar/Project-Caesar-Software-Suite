@@ -5,6 +5,8 @@ import javafx.geometry.Pos
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import tornadofx.*
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class PercentInputField (
         label : String,
@@ -32,8 +34,8 @@ class PercentInputField (
                     } else {
                         it.trim()
                         if (it.isDouble() && it.toDouble() / 100 > minimum) {
+                            println(it)
                             if (it.toDouble() / 100 > maximum) {
-                                println(it)
                                 input.set(maximum)
                             } else {
                                 input.set(it.toDouble() / 100)

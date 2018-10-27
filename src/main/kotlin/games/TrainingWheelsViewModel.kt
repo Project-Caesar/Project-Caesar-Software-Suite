@@ -12,7 +12,7 @@ class TrainingWheelsViewModel : ViewModel() {
     val selectedIconPreview = SimpleObjectProperty<Image>()
 
     val iconClicksToShrink = SimpleIntegerProperty(1)
-    val iconShrinkLimit = SimpleDoubleProperty(.1)
+    val iconShrinkLimit = SimpleDoubleProperty(.3)
     val iconStartSize = SimpleDoubleProperty(.9)
     val iconShrinkRatio = SimpleDoubleProperty(.9)
 
@@ -20,7 +20,7 @@ class TrainingWheelsViewModel : ViewModel() {
 
     init {
         iconShrinkLimit.onChange {
-            if (it > iconStartSize.value) {
+            if (it > iconStartSize.value || selectedIconPreview.value == null) {
                 readyToStart.set(false)
             } else {
                 readyToStart.set(true)
@@ -28,7 +28,7 @@ class TrainingWheelsViewModel : ViewModel() {
         }
 
         iconStartSize.onChange {
-            if (it < iconShrinkLimit.value) {
+            if (it < iconShrinkLimit.value || selectedIconPreview.value == null) {
                 readyToStart.set(false)
             } else {
                 readyToStart.set(true)
