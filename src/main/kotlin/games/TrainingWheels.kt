@@ -14,7 +14,7 @@ class TrainingWheels : View() {
     val viewModel : TrainingWheelsViewModel by inject()
 
     private var successCount = 0
-    private var selectCount = 0
+    private var currentFailCount = 0
 
     // set the root as a basic Pane()
     override val root = Pane()
@@ -63,16 +63,17 @@ class TrainingWheels : View() {
                 // catch any touch or mouse clicked event on the imageview and call
                 // targetSelected when those events occur
                 addEventFilter(InputEvent.ANY) {
-                    if (it.eventType == MouseEvent.MOUSE_CLICKED || it.eventType == TouchEvent.TOUCH_PRESSED) {
+                    if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) {
                         targetSelected(this)
                         successCount++
+                        currentFailCount = 0
                     }
                 }
             }
 
             addEventFilter(InputEvent.ANY) {
-                if (it.eventType == MouseEvent.MOUSE_CLICKED || it.eventType == TouchEvent.TOUCH_PRESSED) {
-                    selectCount++
+                if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) {
+                    currentFailCount++
                 }
             }
         }
