@@ -1,5 +1,6 @@
 package games
 
+import javafx.animation.FadeTransition
 import javafx.scene.image.ImageView
 import javafx.scene.input.InputEvent
 import javafx.scene.input.MouseEvent
@@ -14,7 +15,10 @@ class TrainingWheels : View() {
     val viewModel : TrainingWheelsViewModel by inject()
 
     private var successCount = 0
-    private var currentFailCount = 0
+    private var currentFailCount = -1 // -1 as a success will make it 0 in filter on line 88
+
+    private lateinit var fadeIn : FadeTransition
+    private lateinit var fadeOut : FadeTransition
 
     // set the root as a basic Pane()
     override val root = Pane()
@@ -27,6 +31,18 @@ class TrainingWheels : View() {
             // creates and adds the imageview object to root
             imageview(viewModel.selectedIconPreview.value) {
                 preserveRatioProperty().value = true
+                opacity = 0.0
+
+                fadeIn = this.fade(javafx.util.Duration(1000.0), 100, play=false)
+                fadeOut = this.fade(javafx.util.Duration(1000.0), 0, play=false)
+
+                fadeOut.setOnFinished {
+                    targetSelected(this)
+                    successCount++
+                    // call the csv writer
+                    currentFailCount = -1
+                    fadeIn.play()
+                }
 
                 /**
                  * binding sets the bound property value to another. In this case
@@ -64,9 +80,7 @@ class TrainingWheels : View() {
                 // targetSelected when those events occur
                 addEventFilter(InputEvent.ANY) {
                     if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) {
-                        targetSelected(this)
-                        successCount++
-                        currentFailCount = 0
+                        if (this.opacity == 1.0) fadeOut.play()
                     }
                 }
             }
@@ -78,6 +92,7 @@ class TrainingWheels : View() {
             }
         }
 
+        fadeIn.play()
     }
 
     // This function either shrinks or moves the imageview around the screen

@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.PolygonBuilder;
+import javafx.stage.Window;
 
 public class VirtualKeyboard {
     private final VBox root ;
@@ -99,7 +100,7 @@ public class VirtualKeyboard {
         }
 
         final Button spaceBar = createNonshiftableButton(" ", KeyCode.SPACE, modifiers, target);
-        spaceBar.setMaxWidth(Double.POSITIVE_INFINITY);
+        spaceBar.setMaxWidth(400); // set as max; subject to change
         HBox.setHgrow(spaceBar, Priority.ALWAYS);
 
         final HBox bottomRow = new HBox(5);

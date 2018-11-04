@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.image.Image
+import javafx.scene.media.Media
 import tornadofx.*
 
 class TrainingWheelsViewModel : ViewModel() {
@@ -17,6 +18,9 @@ class TrainingWheelsViewModel : ViewModel() {
     val iconShrinkRatio = SimpleDoubleProperty(.9)
 
     val readyToStart = SimpleBooleanProperty(false)
+
+    val successAudio = SimpleObjectProperty<Media>()
+    val failAudio = SimpleObjectProperty<Media>()
 
     init {
         iconShrinkLimit.onChange {

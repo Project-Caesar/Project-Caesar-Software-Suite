@@ -9,6 +9,7 @@ import javafx.stage.Stage
 import tornadofx.*
 import widgets.PercentInputField
 import VirtualKeyboard
+import javafx.scene.layout.Priority
 
 // main and app used to test the menu
 // will be removed when menu is complete
@@ -34,7 +35,7 @@ class TrainingWheelsMenu : View() {
     private val viewModel = TrainingWheelsViewModel()
 
     // used to select an icon file from a directory
-    private val fileChooser = FileChooser()
+    private val imageFileChooser = FileChooser()
 
 
 
@@ -59,7 +60,7 @@ class TrainingWheelsMenu : View() {
                                 listOf("*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif")
                         )
 
-                        fileChooser.extensionFilters += imageFilter
+                        imageFileChooser.extensionFilters += imageFilter
 
                         setOnAction {
                             /**
@@ -71,7 +72,7 @@ class TrainingWheelsMenu : View() {
                              */
 
 
-                            val file = fileChooser.showOpenDialog(null)
+                            val file = imageFileChooser.showOpenDialog(null)
                             if (file != null) {
                                 viewModel.selectedIconPreview.value = Image(file.toURI().toString())
                             }
@@ -150,7 +151,9 @@ class TrainingWheelsMenu : View() {
                 }
             }
 
-            this += VirtualKeyboard().view()
+            val vkb = VirtualKeyboard()
+
+            this += vkb.view()
         }
     }
 }
