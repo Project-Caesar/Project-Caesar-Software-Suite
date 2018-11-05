@@ -49,7 +49,7 @@ class TrainingWheelsMenu : View() {
         with(root) {
             alignment = Pos.CENTER
 
-            vbox {
+            hbox {
                 alignment = Pos.CENTER
 
                 label("Testee Name")

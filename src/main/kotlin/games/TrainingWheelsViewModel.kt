@@ -22,29 +22,35 @@ class TrainingWheelsViewModel : ViewModel() {
     val failAudio = SimpleObjectProperty<Media>()
 
     init {
-        iconShrinkLimit.onChange {
-            if (it > iconStartSize.value || selectedIconPreview.value == null) {
-                readyToStart.set(false)
-            } else {
-                readyToStart.set(true)
-            }
-        }
 
-        iconStartSize.onChange {
-            if (it < iconShrinkLimit.value || selectedIconPreview.value == null) {
-                readyToStart.set(false)
-            } else {
-                readyToStart.set(true)
-            }
+        testeeName.onChange {
+            readyToStart.set(checkIfReady())
         }
 
         selectedIconPreview.onChange {
-            if (it != null) {
-                readyToStart.set(true)
-            } else {
-                readyToStart.set(false)
-            }
+            readyToStart.set(checkIfReady())
+        }
+
+        iconShrinkLimit.onChange {
+            readyToStart.set(checkIfReady())
+        }
+
+        iconStartSize.onChange {
+            readyToStart.set(checkIfReady())
+        }
+
+        successAudio.onChange {
+            readyToStart.set(checkIfReady())
+        }
+
+        failAudio.onChange {
+            readyToStart.set(checkIfReady())
         }
     }
 
+    private fun checkIfReady() : Boolean {
+        return if (testeeName.value == null || selectedIconPreview.value == null || successAudio.value == null
+                || failAudio.value == null || iconStartSize.value < iconShrinkLimit.value) false
+        else true
+    }
 }
