@@ -9,7 +9,7 @@ import javafx.stage.Stage
 import tornadofx.*
 import widgets.PercentInputField
 import VirtualKeyboard
-import javafx.scene.layout.Priority
+import javafx.scene.media.Media
 
 // main and app used to test the menu
 // will be removed when menu is complete
@@ -36,6 +36,7 @@ class TrainingWheelsMenu : View() {
 
     // used to select an icon file from a directory
     private val imageFileChooser = FileChooser()
+    private val audioFileChooser = FileChooser()
 
 
 
@@ -47,6 +48,18 @@ class TrainingWheelsMenu : View() {
 
         with(root) {
             alignment = Pos.CENTER
+
+            vbox {
+                alignment = Pos.CENTER
+
+                label("Testee Name")
+
+                textfield {
+                    alignment = Pos.CENTER_RIGHT
+
+                    viewModel.testeeName.bind(this.textProperty())
+                }
+            }
 
             hbox {
 
@@ -144,6 +157,38 @@ class TrainingWheelsMenu : View() {
 
             }
 
+            hbox {
+
+                alignment = Pos.CENTER
+
+                val audioFilter = FileChooser.ExtensionFilter(
+                        "Select Audio File",
+                        listOf("*.mp3", "*.wav")
+                )
+
+                audioFileChooser.extensionFilters += audioFilter
+
+                button ("Select Success Audio"){
+
+                    setOnAction {
+                        val file = audioFileChooser.showOpenDialog(null)
+                        if (file != null) {
+                            viewModel.successAudio.value = Media(file.toURI().toString())
+                        }
+                    }
+                }
+
+                button (" Select Fail Audio "){
+
+                    setOnAction {
+                        val file = audioFileChooser.showOpenDialog(null)
+                        if (file != null) {
+                            viewModel.failAudio.value = Media(file.toURI().toString())
+                        }
+                    }
+                }
+            }
+
             button("START") {
                 disableProperty().bind(!viewModel.readyToStart)
                 action {
@@ -151,9 +196,7 @@ class TrainingWheelsMenu : View() {
                 }
             }
 
-            val vkb = VirtualKeyboard()
-
-            this += vkb.view()
+            this += VirtualKeyboard().view()
         }
     }
 }
