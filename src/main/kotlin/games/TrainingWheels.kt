@@ -10,11 +10,19 @@ import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
 import java.util.concurrent.ThreadLocalRandom
 import tornadofx.*
+import java.util.*
+import kotlin.concurrent.timerTask
 
 class TrainingWheels : View() {
 
 
     val viewModel : TrainingWheelsViewModel by inject()
+
+    private val startTimer = Timer()
+
+    private var startTime = 0.toLong()
+
+    private var readyToStart = false
 
     private var successCount = 0
     private var currentFailCount = 0
@@ -33,13 +41,23 @@ class TrainingWheels : View() {
         with(root) {
 
             rectangle {
-                fill = Color.TRANSPARENT
+
+                startTimer.schedule(
+                        timerTask {
+                            this@rectangle.fill = Color.TRANSPARENT
+                            fadeIn.play()
+                            readyToStart = true
+                            startTimer.cancel()
+                            startTime = System.currentTimeMillis()
+                        },
+                        30000
+                )
 
                 widthProperty().bind(root.widthProperty())
                 heightProperty().bind(root.heightProperty())
 
                 addEventFilter(InputEvent.ANY) {
-                    if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) {
+                    if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) && readyToStart) {
                         failAudio.seek(failAudio.startTime)
                         failAudio.play()
                         currentFailCount++
@@ -57,6 +75,8 @@ class TrainingWheels : View() {
 
                 fadeOut.setOnFinished {
                     targetSelected(this)
+                    val timeTillSuccess = System.currentTimeMillis() - startTime
+                    startTime = timeTillSuccess
                     successCount++
                     // call the csv writer
                     currentFailCount = 0
@@ -98,7 +118,7 @@ class TrainingWheels : View() {
                 // catch any touch or mouse clicked event on the imageview and call
                 // targetSelected when those events occur
                 addEventFilter(InputEvent.ANY) {
-                    if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) {
+                    if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED && readyToStart) {
                         if (this.opacity == 1.0) {
                             successAudio.seek(successAudio.startTime)
                             successAudio.play()
@@ -109,7 +129,7 @@ class TrainingWheels : View() {
             }
         }
 
-        fadeIn.play()
+        //fadeIn.play()
     }
 
     // This function either shrinks or moves the imageview around the screen
