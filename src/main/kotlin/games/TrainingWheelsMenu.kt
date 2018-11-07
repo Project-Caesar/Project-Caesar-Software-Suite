@@ -24,8 +24,8 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
     override fun start(stage: Stage) {
         super.start(stage)
         stage.isFullScreen = true
-        stage.fullScreenExitHint = ""
         stage.fullScreenExitKeyCombination = KeyCombination.NO_MATCH
+        stage.fullScreenExitHint = ""
     }
 }
 
@@ -57,7 +57,13 @@ class TrainingWheelsMenu : View() {
                 textfield {
                     alignment = Pos.CENTER_RIGHT
 
-                    viewModel.testeeName.bind(this.textProperty())
+                    textProperty().onChange {
+                        if (it != null) {
+                            viewModel.testeeName.set(it)
+                        } else {
+                            viewModel.testeeName.set("")
+                        }
+                    }
                 }
             }
 

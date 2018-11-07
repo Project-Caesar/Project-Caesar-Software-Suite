@@ -33,6 +33,8 @@ class TrainingWheels : View() {
     private val successAudio = MediaPlayer(viewModel.successAudio.value)
     private val failAudio = MediaPlayer(viewModel.failAudio.value)
 
+    private val exitTest = {false; false; false; false}
+
     // set the root as a basic Pane()
     override val root = Pane()
 
@@ -41,6 +43,17 @@ class TrainingWheels : View() {
         with(root) {
 
             rectangle {
+
+                // try mouse dragged entered and exit?
+                setOnMouseDragged {
+                    // check and see if the point is close to a corner and set tht value as true
+                    // in exitTest
+                    println("${it.x} ${it.y} ${it.sceneX} ${it.sceneY} ${it.screenX} ${it.screenY}")
+                }
+
+                setOnMouseDragExited {
+                    // if all the exitTest elements are true, set up pop-up with option to exit test
+                }
 
                 startTimer.schedule(
                         timerTask {
@@ -62,6 +75,7 @@ class TrainingWheels : View() {
                         failAudio.play()
                         currentFailCount++
                     }
+
                 }
             }
 
