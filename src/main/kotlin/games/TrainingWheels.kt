@@ -33,7 +33,7 @@ class TrainingWheels : View() {
     private val successAudio = MediaPlayer(viewModel.successAudio.value)
     private val failAudio = MediaPlayer(viewModel.failAudio.value)
 
-    private val exitTest = {false; false; false; false}
+    private val exitTest = mutableListOf(false,false,false,false)
 
     // set the root as a basic Pane()
     override val root = Pane()
@@ -48,11 +48,30 @@ class TrainingWheels : View() {
                 setOnMouseDragged {
                     // check and see if the point is close to a corner and set tht value as true
                     // in exitTest
-                    println("${it.x} ${it.y} ${it.sceneX} ${it.sceneY} ${it.screenX} ${it.screenY}")
+                    if (it.sceneX < 50 && it.sceneY < 50) {
+                        exitTest[0] = true
+                        println(0)
+                    } else if (it.sceneX < 50 && it.sceneY > root.height - 50) {
+                        exitTest[1] = true
+                        println(1)
+                    } else if (it.sceneX > root.width - 50 && it.sceneY < 50) {
+                        exitTest[2] = true
+                        println(2)
+                    } else if (it.sceneX > root.width - 50 && it.sceneY > root.height - 50) {
+                        exitTest[3] = true
+                        println(3)
+                    }
                 }
 
                 setOnMouseDragExited {
-                    // if all the exitTest elements are true, set up pop-up with option to exit test
+                    if (exitTest.contains(false)) {
+                        println("fail")
+                        for (i in 0 until exitTest.size) {
+                            exitTest[i] = false
+                        }
+                    } else {
+                        println("Time to exit")
+                    }
                 }
 
                 startTimer.schedule(
@@ -70,10 +89,29 @@ class TrainingWheels : View() {
                 heightProperty().bind(root.heightProperty())
 
                 addEventFilter(InputEvent.ANY) {
-                    if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED) && readyToStart) {
-                        failAudio.seek(failAudio.startTime)
-                        failAudio.play()
-                        currentFailCount++
+                    if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED)) {
+
+                        if (exitTest.contains(false)) {
+                            println("fail")
+                            for (i in 0 until exitTest.size) {
+                                exitTest[i] = false
+                            }
+
+                            if (readyToStart) {
+                                failAudio.seek(failAudio.startTime)
+                                failAudio.play()
+                                currentFailCount++
+                            }
+                        } else {
+                            println("Time to exit")
+                            for (i in 0 until exitTest.size) {
+                                exitTest[i] = false
+                            }
+                        }
+
+                        for (i in 0 until exitTest.size) {
+                            println(exitTest[i])
+                        }
                     }
 
                 }
