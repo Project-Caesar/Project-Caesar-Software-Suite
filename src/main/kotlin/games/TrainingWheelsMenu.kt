@@ -169,7 +169,7 @@ class TrainingWheelsMenu : View() {
 
                 val audioFilter = FileChooser.ExtensionFilter(
                         "Select Audio File",
-                        listOf("*.mp3", "*.wav")
+                        listOf("*.wav")
                 )
 
                 audioFileChooser.extensionFilters += audioFilter
