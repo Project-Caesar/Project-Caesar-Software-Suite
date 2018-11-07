@@ -10,6 +10,9 @@ import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
 import java.util.concurrent.ThreadLocalRandom
 import tornadofx.*
+import java.io.File
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -201,7 +204,38 @@ class TrainingWheels : View() {
                 target.fitHeight = target.fitHeight * viewModel.iconShrinkRatio.value
             }
         }
+
+        //create the array of data that needs to be written to the csv file
+        val data = arrayOf(viewModel.testeeName.value, viewModel.selectedIconPreview.value.impl_getUrl().replaceBeforeLast("/",""), target.x.toString(), target.y.toString(), LocalTime.now().toString())
+
+        //creates a file variable used to check if the file already exists
+        val f = File(System.getProperty("user.dir") + "/Test_Logs/" + data[0] + "_" + LocalDate.now() + ".csv")
+
+        //conditional that will check if the file already exists for this subject and day
+        if (f.isFile) {
+
+            //if the file already exists, append the new row to the csv file
+            CSV.addLine(data)
+        }
+        else {
+
+            //if the file does not exist, create the file and append the new row to it
+            CSV.createFile(data)
+            CSV.addLine(data)
+        }
+
+        //triggers the arduino to release a pellet for the subject
+        callArduino()
+
         //println("${target.fitWidth} ${target.fitHeight} ${target.x} ${target.y} ${root.width} ${root.height}")
     }
 
-}
+    private fun callArduino() {
+        val command = arrayOf("sh", "-c", "echo 5 > /dev/ttyUSB0")
+        val echoProcess = Runtime.getRuntime().exec(command)
+        echoProcess.waitFor()
+        Thread.sleep(1_000)
+    }
+        //println("${target.fitWidth} ${target.fitHeight} ${target.x} ${target.y} ${root.width} ${root.height}")
+    }
+
