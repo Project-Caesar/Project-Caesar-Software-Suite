@@ -1,4 +1,5 @@
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -8,7 +9,7 @@ public class CSV {
 
     //This function will create the data file in the event that the file does not already exist
     public static void createFile(String[] data) throws IOException{
-
+        new File(System.getProperty("user.dir") + "/Test_Logs").mkdirs();
         //bufferedwriter that will write the file
         BufferedWriter br = new BufferedWriter(new FileWriter(System.getProperty("user.dir") + "/Test_Logs/" + data[0] + "_" + LocalDate.now() + ".csv"));
 
