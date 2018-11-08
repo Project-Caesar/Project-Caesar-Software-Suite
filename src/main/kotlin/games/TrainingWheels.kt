@@ -244,7 +244,7 @@ class TrainingWheels : View() {
         val command = arrayOf("sh", "-c", "echo 5 > /dev/ttyUSB0")
         val echoProcess = Runtime.getRuntime().exec(command)
         echoProcess.waitFor()
-        Thread.sleep(1_000)
+        //Thread.sleep(1_000)
     }
         //println("${target.fitWidth} ${target.fitHeight} ${target.x} ${target.y} ${root.width} ${root.height}")
     }
