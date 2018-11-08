@@ -49,7 +49,7 @@ class TrainingWheelsViewModel : ViewModel() {
     }
 
     private fun checkIfReady() : Boolean {
-        return !(testeeName.value == "" || selectedIconPreview.value == null || successAudio.value == null
-                || failAudio.value == null || iconStartSize.value < iconShrinkLimit.value)
+        return !(testeeName.value == "" || testeeName.value == null || selectedIconPreview.value == null
+                || successAudio.value == null || failAudio.value == null || iconStartSize.value < iconShrinkLimit.value)
     }
 }

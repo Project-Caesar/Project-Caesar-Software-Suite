@@ -1,6 +1,9 @@
 package games
 
 import javafx.animation.FadeTransition
+import javafx.scene.control.Alert
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.ButtonType
 import javafx.scene.image.ImageView
 import javafx.scene.input.InputEvent
 import javafx.scene.input.MouseEvent
@@ -36,12 +39,23 @@ class TrainingWheels : View() {
     private val successAudio = MediaPlayer(viewModel.successAudio.value)
     private val failAudio = MediaPlayer(viewModel.failAudio.value)
 
+    /*private val exitDialog = alert(
+            AlertType.CONFIRMATION,
+            "End Training Wheels Test",
+            "Select OK to end test or cancel to continue"
+    )*/
+    private val exitDialog = Alert(AlertType.CONFIRMATION)
+
     private val exitTest = mutableListOf(false,false,false,false)
 
     // set the root as a basic Pane()
     override val root = Pane()
 
     init {
+
+        // set up exitDialog text
+        exitDialog.headerText = "End Training Wheels Test"
+        exitDialog.contentText = "Select OK to end test or cancel to continue"
 
         with(root) {
 
@@ -53,30 +67,20 @@ class TrainingWheels : View() {
                     // in exitTest
                     if (it.sceneX < 50 && it.sceneY < 50) {
                         exitTest[0] = true
-                        println(0)
+                        //println(0)
                     } else if (it.sceneX < 50 && it.sceneY > root.height - 50) {
                         exitTest[1] = true
-                        println(1)
+                        //println(1)
                     } else if (it.sceneX > root.width - 50 && it.sceneY < 50) {
                         exitTest[2] = true
-                        println(2)
+                        //println(2)
                     } else if (it.sceneX > root.width - 50 && it.sceneY > root.height - 50) {
                         exitTest[3] = true
-                        println(3)
+                        //println(3)
                     }
                 }
 
-                setOnMouseDragExited {
-                    if (exitTest.contains(false)) {
-                        println("fail")
-                        for (i in 0 until exitTest.size) {
-                            exitTest[i] = false
-                        }
-                    } else {
-                        println("Time to exit")
-                    }
-                }
-
+                // Keep the screen dark for 30 seconds, then start the test
                 startTimer.schedule(
                         timerTask {
                             this@rectangle.fill = Color.TRANSPARENT
@@ -92,31 +96,37 @@ class TrainingWheels : View() {
                 heightProperty().bind(root.heightProperty())
 
                 addEventFilter(InputEvent.ANY) {
+                    // if there is input
                     if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED)) {
 
+                        // if the input is not to end the test
                         if (exitTest.contains(false)) {
-                            println("fail")
+                            //println("fail")
                             for (i in 0 until exitTest.size) {
                                 exitTest[i] = false
                             }
 
+                            // if the input is during the test, then trigger fail
                             if (readyToStart) {
                                 failAudio.seek(failAudio.startTime)
                                 failAudio.play()
                                 currentFailCount++
                             }
+                        // else the input is to end the test
                         } else {
-                            println("Time to exit")
+                            println("here")
+                            val popupResult = exitDialog.showAndWait()
+
+                            if (popupResult.get() == ButtonType.OK) {
+                                println("Time to exit")
+                                replaceWith(find<TrainingWheelsMenu>())
+                            }
+
                             for (i in 0 until exitTest.size) {
                                 exitTest[i] = false
                             }
                         }
-
-                        for (i in 0 until exitTest.size) {
-                            println(exitTest[i])
-                        }
                     }
-
                 }
             }
 
