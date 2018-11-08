@@ -39,11 +39,6 @@ class TrainingWheels : View() {
     private val successAudio = MediaPlayer(viewModel.successAudio.value)
     private val failAudio = MediaPlayer(viewModel.failAudio.value)
 
-    /*private val exitDialog = alert(
-            AlertType.CONFIRMATION,
-            "End Training Wheels Test",
-            "Select OK to end test or cancel to continue"
-    )*/
     private val exitDialog = Alert(AlertType.CONFIRMATION)
 
     private val exitTest = mutableListOf(false,false,false,false)
