@@ -13,6 +13,7 @@ import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
 import java.util.concurrent.ThreadLocalRandom
 import tornadofx.*
+import usecases.callArduino
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
@@ -39,22 +40,38 @@ class TrainingWheels : View() {
     private val successAudio = MediaPlayer(viewModel.successAudio.value)
     private val failAudio = MediaPlayer(viewModel.failAudio.value)
 
-    private val exitDialog = Alert(AlertType.CONFIRMATION)
-
+    private val exitDialog = Alert(AlertType.CONFIRMATION).apply {
+        // set up exitDialog text
+        this.headerText = "End Training Wheels Test"
+        this.contentText = "Select OK to end test or cancel to continue"
+    }
     private val exitTest = mutableListOf(false,false,false,false)
+
 
     // set the root as a basic Pane()
     override val root = Pane()
 
     init {
 
-        // set up exitDialog text
-        exitDialog.headerText = "End Training Wheels Test"
-        exitDialog.contentText = "Select OK to end test or cancel to continue"
-
         with(root) {
 
             rectangle {
+
+                // Set to window size
+                widthProperty().bind(root.widthProperty())
+                heightProperty().bind(root.heightProperty())
+
+                // Keep the screen dark for 30 seconds, then start the test
+                startTimer.schedule(
+                        timerTask {
+                            this@rectangle.fill = Color.TRANSPARENT
+                            fadeIn.play()
+                            readyToStart = true
+                            startTimer.cancel()
+                            startTime = System.currentTimeMillis()
+                        },
+                        30000
+                )
 
                 // try mouse dragged entered and exit?
                 setOnMouseDragged {
@@ -75,66 +92,54 @@ class TrainingWheels : View() {
                     }
                 }
 
-                // Keep the screen dark for 30 seconds, then start the test
-                startTimer.schedule(
-                        timerTask {
-                            this@rectangle.fill = Color.TRANSPARENT
-                            fadeIn.play()
-                            readyToStart = true
-                            startTimer.cancel()
-                            startTime = System.currentTimeMillis()
-                        },
-                        30000
-                )
-
-                widthProperty().bind(root.widthProperty())
-                heightProperty().bind(root.heightProperty())
-
+                // Check for any mouse click or touchscreen events
                 addEventFilter(InputEvent.ANY) {
                     // if there is input
                     if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED)) {
 
-                        // if the input is not to end the test
+                        // Check if the input fails the exit condition
                         if (exitTest.contains(false)) {
-                            //println("fail")
                             for (i in 0 until exitTest.size) {
                                 exitTest[i] = false
                             }
 
-                            // if the input is during the test, then trigger fail
+                            // if the input fails the exit condition during the test, then trigger fail
                             if (readyToStart) {
                                 failAudio.seek(failAudio.startTime)
                                 failAudio.play()
                                 currentFailCount++
                             }
-                        // else the input is to end the test
+
+                        // else the input passes the exit condition
                         } else {
-                            println("here")
+
+                            // give user opportunity to end the test
                             val popupResult = exitDialog.showAndWait()
 
                             if (popupResult.get() == ButtonType.OK) {
-                                println("Time to exit")
+                                println("Exit Dialog Triggered")
                                 replaceWith(find<TrainingWheelsMenu>())
-                            }
-
-                            for (i in 0 until exitTest.size) {
-                                exitTest[i] = false
+                            } else {
+                                for (i in 0 until exitTest.size) {
+                                    exitTest[i] = false
+                                }
                             }
                         }
                     }
                 }
             }
 
-            // creates and adds the imageview object to root
+            // Creates and adds the imageview target to root
             imageview(viewModel.selectedIconPreview.value) {
                 preserveRatioProperty().value = true
                 opacity = 0.0
 
+                // initialize the fade variables
                 fadeIn = this.fade(javafx.util.Duration(1000.0), 100, play=false)
                 fadeOut = this.fade(javafx.util.Duration(1000.0), 0, play=false)
 
                 fadeOut.setOnFinished {
-                    targetSelected(this)
+                    targetSelected(fadeOut.node as ImageView)
                     val timeTillSuccess = System.currentTimeMillis() - startTime
                     startTime = timeTillSuccess
                     successCount++
@@ -231,16 +236,7 @@ class TrainingWheels : View() {
 
         //triggers the arduino to release a pellet for the subject
         callArduino()
-
-        //println("${target.fitWidth} ${target.fitHeight} ${target.x} ${target.y} ${root.width} ${root.height}")
     }
 
-    private fun callArduino() {
-        val command = arrayOf("sh", "-c", "echo 5 > /dev/ttyUSB0")
-        val echoProcess = Runtime.getRuntime().exec(command)
-        echoProcess.waitFor()
-        //Thread.sleep(1_000)
-    }
-        //println("${target.fitWidth} ${target.fitHeight} ${target.x} ${target.y} ${root.width} ${root.height}")
-    }
+}
 
