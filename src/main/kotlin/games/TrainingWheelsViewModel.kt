@@ -4,8 +4,21 @@ import javafx.beans.property.*
 import javafx.scene.image.Image
 import javafx.scene.media.Media
 import tornadofx.*
+import java.io.File
 
 class TrainingWheelsViewModel : ViewModel() {
+
+    val csvHeaders = arrayOf(
+            "Testee Name",
+            "Icon Name",
+            "Height",
+            "Width",
+            "X Position",
+            "Y Position",
+            "Number of Failures",
+            "Time to Succeed",
+            "TimeStamp"
+    )
 
     val testeeName = SimpleStringProperty()
 
@@ -20,6 +33,8 @@ class TrainingWheelsViewModel : ViewModel() {
 
     val successAudio = SimpleObjectProperty<Media>()
     val failAudio = SimpleObjectProperty<Media>()
+
+    val dataFileDirectory = SimpleStringProperty(System.getProperty("user.dir") + "/TrainingWheelsLogs")
 
     init {
 

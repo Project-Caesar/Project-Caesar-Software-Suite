@@ -13,10 +13,9 @@ import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
 import java.util.concurrent.ThreadLocalRandom
 import tornadofx.*
+import usecases.CSV
 import usecases.callArduino
-import java.io.File
-import java.time.LocalDate
-import java.time.LocalTime
+import java.sql.Timestamp
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -47,87 +46,19 @@ class TrainingWheels : View() {
     }
     private val exitTest = mutableListOf(false,false,false,false)
 
+    private val csvWriter = CSV(
+            viewModel.csvHeaders,
+            "${viewModel.testeeName.value}_${Timestamp(System.currentTimeMillis())}.csv",
+            viewModel.dataFileDirectory.value
+    )
+
 
     // set the root as a basic Pane()
     override val root = Pane()
 
     init {
-
+        println("\"${viewModel.testeeName.value}_${Timestamp(System.currentTimeMillis())}.csv".replace(" ", "_") + " ${viewModel.dataFileDirectory.value}")
         with(root) {
-
-            rectangle {
-
-                // Set to window size
-                widthProperty().bind(root.widthProperty())
-                heightProperty().bind(root.heightProperty())
-
-                // Keep the screen dark for 30 seconds, then start the test
-                startTimer.schedule(
-                        timerTask {
-                            this@rectangle.fill = Color.TRANSPARENT
-                            fadeIn.play()
-                            readyToStart = true
-                            startTimer.cancel()
-                            startTime = System.currentTimeMillis()
-                        },
-                        30000
-                )
-
-                // try mouse dragged entered and exit?
-                setOnMouseDragged {
-                    // check and see if the point is close to a corner and set tht value as true
-                    // in exitTest
-                    if (it.sceneX < 50 && it.sceneY < 50) {
-                        exitTest[0] = true
-                        //println(0)
-                    } else if (it.sceneX < 50 && it.sceneY > root.height - 50) {
-                        exitTest[1] = true
-                        //println(1)
-                    } else if (it.sceneX > root.width - 50 && it.sceneY < 50) {
-                        exitTest[2] = true
-                        //println(2)
-                    } else if (it.sceneX > root.width - 50 && it.sceneY > root.height - 50) {
-                        exitTest[3] = true
-                        //println(3)
-                    }
-                }
-
-                // Check for any mouse click or touchscreen events
-                addEventFilter(InputEvent.ANY) {
-                    // if there is input
-                    if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED)) {
-
-                        // Check if the input fails the exit condition
-                        if (exitTest.contains(false)) {
-                            for (i in 0 until exitTest.size) {
-                                exitTest[i] = false
-                            }
-
-                            // if the input fails the exit condition during the test, then trigger fail
-                            if (readyToStart) {
-                                failAudio.seek(failAudio.startTime)
-                                failAudio.play()
-                                currentFailCount++
-                            }
-
-                        // else the input passes the exit condition
-                        } else {
-
-                            // give user opportunity to end the test
-                            val popupResult = exitDialog.showAndWait()
-
-                            if (popupResult.get() == ButtonType.OK) {
-                                println("Exit Dialog Triggered")
-                                replaceWith(find<TrainingWheelsMenu>())
-                            } else {
-                                for (i in 0 until exitTest.size) {
-                                    exitTest[i] = false
-                                }
-                            }
-                        }
-                    }
-                }
-            }
 
             // Creates and adds the imageview target to root
             imageview(viewModel.selectedIconPreview.value) {
@@ -139,11 +70,15 @@ class TrainingWheels : View() {
                 fadeOut = this.fade(javafx.util.Duration(1000.0), 0, play=false)
 
                 fadeOut.setOnFinished {
+                    // moves or shrinks target
                     targetSelected(fadeOut.node as ImageView)
-                    val timeTillSuccess = System.currentTimeMillis() - startTime
-                    startTime = timeTillSuccess
+
+                    // triggers the arduino to release a pellet for the subject
+                    callArduino()
+
                     successCount++
                     // call the csv writer
+                    callCSVWriter(fadeOut.node as ImageView)
                     currentFailCount = 0
                     fadeIn.play()
                 }
@@ -192,6 +127,80 @@ class TrainingWheels : View() {
                     }
                 }
             }
+
+            rectangle {
+
+                // Set to window size
+                widthProperty().bind(root.widthProperty())
+                heightProperty().bind(root.heightProperty())
+
+                // Keep the screen dark for 30 seconds, then start the test
+                startTimer.schedule(
+                        timerTask {
+                            this@rectangle.fill = Color.TRANSPARENT
+                            fadeIn.play()
+                            readyToStart = true
+                            startTimer.cancel()
+                            startTime = System.currentTimeMillis()
+                        },
+                        0//30000
+                )
+
+                // try mouse dragged entered and exit?
+                setOnMouseDragged {
+                    // check and see if the point is close to a corner and set tht value as true
+                    // in exitTest
+                    if (it.sceneX < 50 && it.sceneY < 50) {
+                        exitTest[0] = true
+                        //println(0)
+                    } else if (it.sceneX < 50 && it.sceneY > root.height - 50) {
+                        exitTest[1] = true
+                        //println(1)
+                    } else if (it.sceneX > root.width - 50 && it.sceneY < 50) {
+                        exitTest[2] = true
+                        //println(2)
+                    } else if (it.sceneX > root.width - 50 && it.sceneY > root.height - 50) {
+                        exitTest[3] = true
+                        //println(3)
+                    }
+                }
+
+                // Check for any mouse click or touchscreen events
+                addEventFilter(InputEvent.ANY) {
+                    // if there is input
+                    if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED)) {
+
+                        // Check if the input fails the exit condition
+                        if (exitTest.contains(false)) {
+                            for (i in 0 until exitTest.size) {
+                                exitTest[i] = false
+                            }
+
+                            // if the input fails the exit condition during the test, then trigger fail
+                            if (readyToStart) {
+                                failAudio.seek(failAudio.startTime)
+                                failAudio.play()
+                                currentFailCount++
+                            }
+
+                            // else the input passes the exit condition
+                        } else {
+
+                            // give user opportunity to end the test
+                            val popupResult = exitDialog.showAndWait()
+
+                            if (popupResult.get() == ButtonType.OK) {
+                                println("Exit Dialog Triggered")
+                                replaceWith(find<TrainingWheelsMenu>())
+                            } else {
+                                for (i in 0 until exitTest.size) {
+                                    exitTest[i] = false
+                                }
+                            }
+                        }
+                    }
+                }
+            }.toBack()
         }
 
         //fadeIn.play()
@@ -214,28 +223,35 @@ class TrainingWheels : View() {
                 target.fitHeight = target.fitHeight * viewModel.iconShrinkRatio.value
             }
         }
+    }
 
-        //create the array of data that needs to be written to the csv file
-        val data = arrayOf(viewModel.testeeName.value, viewModel.selectedIconPreview.value.impl_getUrl().replaceBeforeLast("/",""), target.x.toString(), target.y.toString(), LocalTime.now().toString())
+    private fun callCSVWriter(imageView : ImageView) {
+        val timeTillSuccess = System.currentTimeMillis() - startTime
+        println(timeTillSuccess)
+        val stuff = arrayOf(
+                viewModel.testeeName.value,
+                viewModel.selectedIconPreview.value.impl_getUrl().replaceAfterLast("/", ""),
+                imageView.fitHeight.toString(),
+                imageView.fitHeight.toString(),
+                imageView.x.toString(),
+                imageView.y.toString(),
+                currentFailCount.toString(),
+                timeFormatter(timeTillSuccess),
+                Timestamp(System.currentTimeMillis()).toString()
+        )
 
-        //creates a file variable used to check if the file already exists
-        val f = File(System.getProperty("user.dir") + "/Test_Logs/" + data[0] + "_" + LocalDate.now() + ".csv")
+        csvWriter.addLine(stuff)
 
-        //conditional that will check if the file already exists for this subject and day
-        if (f.isFile) {
+        startTime = System.currentTimeMillis()
+    }
 
-            //if the file already exists, append the new row to the csv file
-            CSV.addLine(data)
-        }
-        else {
+    private fun timeFormatter(time : Long) : String {
+        val millis = time % 1000
+        val second = time / 1000 % 60
+        val minute = time / (1000 * 60) % 60
+        val hour = time / (1000 * 60 * 60) % 24
 
-            //if the file does not exist, create the file and append the new row to it
-            CSV.createFile(data)
-            CSV.addLine(data)
-        }
-
-        //triggers the arduino to release a pellet for the subject
-        callArduino()
+        return String.format("%02d:%02d:%02d.%d", hour, minute, second, millis)
     }
 
 }

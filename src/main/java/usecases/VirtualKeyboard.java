@@ -1,3 +1,5 @@
+package usecases;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
@@ -23,7 +25,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.PolygonBuilder;
-import javafx.stage.Window;
 
 public class VirtualKeyboard {
     private final VBox root ;

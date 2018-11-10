@@ -8,8 +8,9 @@ import javafx.stage.FileChooser
 import javafx.stage.Stage
 import tornadofx.*
 import widgets.PercentInputField
-import VirtualKeyboard
+import usecases.VirtualKeyboard
 import javafx.scene.media.Media
+import javafx.stage.DirectoryChooser
 
 // main and app used to test the menu
 // will be removed when menu is complete
@@ -37,6 +38,8 @@ class TrainingWheelsMenu : View() {
     // used to select an icon file from a directory
     private val imageFileChooser = FileChooser()
     private val audioFileChooser = FileChooser()
+
+    private val directoryChooser = DirectoryChooser()
 
 
 
@@ -191,6 +194,18 @@ class TrainingWheelsMenu : View() {
                         if (file != null) {
                             viewModel.failAudio.value = Media(file.toURI().toString())
                         }
+                    }
+                }
+            }
+
+            button("Select Folder to Save Data") {
+                setOnAction {
+                    val selectedDirectory = directoryChooser.showDialog(null)
+
+                    if (selectedDirectory == null) {
+                        viewModel.dataFileDirectory.value = System.getProperty("user.dir") + "/TrainingWheelsLogs"
+                    } else {
+                        viewModel.dataFileDirectory.value = selectedDirectory.absolutePath
                     }
                 }
             }
