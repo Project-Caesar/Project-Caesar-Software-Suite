@@ -163,7 +163,7 @@ class TrainingWheels : View() {
                             startTimer.cancel()
                             startTime = System.currentTimeMillis()
                         },
-                        0//30000
+                        30000
                 )
 
                 // try mouse dragged entered and exit?
