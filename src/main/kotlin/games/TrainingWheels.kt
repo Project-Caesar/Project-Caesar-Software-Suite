@@ -134,7 +134,7 @@ class TrainingWheels : View() {
                 // catch any touch or mouse clicked event on the imageview and call
                 // targetSelected when those events occur
                 addEventFilter(InputEvent.ANY) {
-                    if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED && readyToStart) {
+                    if (it.eventType == MouseEvent.MOUSE_RELEASED && readyToStart && !isAudioPlaying()) {
                         if (this.opacity == 1.0) {
                             successAudio.play()
                             targetFadeOut.play()
@@ -198,7 +198,7 @@ class TrainingWheels : View() {
 
                             // if the input fails the exit condition during the test when a fail can
                             // be accepted, then trigger fail
-                            if (readyToStart && gameTarget.opacity == 1.0) {
+                            if (readyToStart && gameTarget.opacity == 1.0 && !isAudioPlaying()) {
                                 failAudio.play()
                                 currentFailCount++
                             }
@@ -222,6 +222,11 @@ class TrainingWheels : View() {
                 }
             }.toBack()
         }
+    }
+
+    private fun isAudioPlaying() : Boolean {
+        //println("${failAudio.isPlaying} ${successAudio.isPlaying} ${failAudio.isPlaying || successAudio.isPlaying}")
+        return failAudio.isPlaying || successAudio.isPlaying
     }
 
     // This function either shrinks or moves the imageview around the screen
