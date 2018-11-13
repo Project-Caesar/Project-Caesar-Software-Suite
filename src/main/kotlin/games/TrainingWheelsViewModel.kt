@@ -8,8 +8,8 @@ import tornadofx.*
 class TrainingWheelsViewModel : ViewModel() {
 
     private val defaultIcon = Image("/Circle-icon.png")
-    private val defaultSuccessAudio = Media(TrainingWheelsViewModel::class.java.getResource("/correct.wav").toString())
-    private val defaultFailAudio = Media(TrainingWheelsViewModel::class.java.getResource("/incorrect.wav").toString())
+    val defaultSuccessAudio = Media(TrainingWheelsViewModel::class.java.getResource("/correct.wav").toString())
+    val defaultFailAudio = Media(TrainingWheelsViewModel::class.java.getResource("/incorrect.wav").toString())
 
     val csvHeaders = arrayOf(
             "Testee Name",

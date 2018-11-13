@@ -10,6 +10,7 @@ import javafx.scene.input.InputEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.input.TouchEvent
 import javafx.scene.layout.Pane
+import javafx.scene.media.AudioClip
 import javafx.scene.media.MediaPlayer
 import javafx.scene.shape.Rectangle
 import java.util.concurrent.ThreadLocalRandom
@@ -41,8 +42,8 @@ class TrainingWheels : View() {
     private lateinit var targetFadeIn : FadeTransition
     private lateinit var targetFadeOut : FadeTransition
 
-    private val successAudio = MediaPlayer(viewModel.successAudio.value)
-    private val failAudio = MediaPlayer(viewModel.failAudio.value)
+    private val successAudio = AudioClip(viewModel.successAudio.value.source)
+    private val failAudio = AudioClip(viewModel.failAudio.value.source)
 
     private val exitDialog = Alert(AlertType.CONFIRMATION).apply {
         // set up exitDialog text
@@ -135,7 +136,6 @@ class TrainingWheels : View() {
                 addEventFilter(InputEvent.ANY) {
                     if (it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED && readyToStart) {
                         if (this.opacity == 1.0) {
-                            successAudio.seek(successAudio.startTime)
                             successAudio.play()
                             targetFadeOut.play()
                         }
@@ -199,7 +199,6 @@ class TrainingWheels : View() {
                             // if the input fails the exit condition during the test when a fail can
                             // be accepted, then trigger fail
                             if (readyToStart && gameTarget.opacity == 1.0) {
-                                failAudio.seek(failAudio.startTime)
                                 failAudio.play()
                                 currentFailCount++
                             }
