@@ -53,7 +53,7 @@ class TrainingWheels : View() {
 
     private val csvWriter = CSV(
             viewModel.csvHeaders,
-            "${viewModel.testeeName.value}_${Timestamp(System.currentTimeMillis())}.csv".replace(" ", "_"),
+            "${viewModel.testeeName.value}_${Timestamp(System.currentTimeMillis())}.csv".replace(":", "_"),
             viewModel.dataFileDirectory.value
     )
 
