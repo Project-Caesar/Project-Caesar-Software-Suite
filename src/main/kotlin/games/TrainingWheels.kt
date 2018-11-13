@@ -1,5 +1,6 @@
 package games
 
+import javafx.util.Duration
 import javafx.animation.FadeTransition
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
@@ -10,7 +11,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.input.TouchEvent
 import javafx.scene.layout.Pane
 import javafx.scene.media.MediaPlayer
-import javafx.scene.paint.Color
+import javafx.scene.shape.Rectangle
 import java.util.concurrent.ThreadLocalRandom
 import tornadofx.*
 import usecases.CSV
@@ -24,7 +25,11 @@ class TrainingWheels : View() {
 
     val viewModel : TrainingWheelsViewModel by inject()
 
+    private lateinit var gameBackground : Rectangle
+    private lateinit var gameTarget : ImageView
+
     private val startTimer = Timer()
+    private val delayTimer = Timer()
 
     private var startTime = 0.toLong()
 
@@ -33,8 +38,8 @@ class TrainingWheels : View() {
     private var successCount = 0
     private var currentFailCount = 0
 
-    private lateinit var fadeIn : FadeTransition
-    private lateinit var fadeOut : FadeTransition
+    private lateinit var targetFadeIn : FadeTransition
+    private lateinit var targetFadeOut : FadeTransition
 
     private val successAudio = MediaPlayer(viewModel.successAudio.value)
     private val failAudio = MediaPlayer(viewModel.failAudio.value)
@@ -57,30 +62,40 @@ class TrainingWheels : View() {
     override val root = Pane()
 
     init {
-        println("\"${viewModel.testeeName.value}_${Timestamp(System.currentTimeMillis())}.csv".replace(" ", "_") + " ${viewModel.dataFileDirectory.value}")
+        //println("\"${viewModel.testeeName.value}_${Timestamp(System.currentTimeMillis())}.csv".replace(" ", "_") + " ${viewModel.dataFileDirectory.value}")
         with(root) {
 
             // Creates and adds the imageview target to root
             imageview(viewModel.selectedIconPreview.value) {
+
+                gameTarget = this
+
                 preserveRatioProperty().value = true
                 opacity = 0.0
 
                 // initialize the fade variables
-                fadeIn = this.fade(javafx.util.Duration(1000.0), 100, play=false)
-                fadeOut = this.fade(javafx.util.Duration(1000.0), 0, play=false)
+                targetFadeIn = this.fade(Duration(1000.0), 100, play=false)
+                targetFadeOut = this.fade(Duration(1000.0), 0, play=false)
 
-                fadeOut.setOnFinished {
+                targetFadeOut.setOnFinished {
+
                     // moves or shrinks target
-                    targetSelected(fadeOut.node as ImageView)
+                    targetSelected(targetFadeOut.node as ImageView)
 
                     // triggers the arduino to release a pellet for the subject
                     callArduino()
 
                     successCount++
                     // call the csv writer
-                    callCSVWriter(fadeOut.node as ImageView)
+                    callCSVWriter(targetFadeOut.node as ImageView)
                     currentFailCount = 0
-                    fadeIn.play()
+
+                    delayTimer.schedule(
+                            timerTask {
+                                targetFadeIn.play()
+                            },
+                            viewModel.delayBetweenTrials.value.toLong() * 1000
+                    )
                 }
 
                 /**
@@ -122,7 +137,7 @@ class TrainingWheels : View() {
                         if (this.opacity == 1.0) {
                             successAudio.seek(successAudio.startTime)
                             successAudio.play()
-                            fadeOut.play()
+                            targetFadeOut.play()
                         }
                     }
                 }
@@ -130,15 +145,20 @@ class TrainingWheels : View() {
 
             rectangle {
 
+                gameBackground = this
+
                 // Set to window size
                 widthProperty().bind(root.widthProperty())
                 heightProperty().bind(root.heightProperty())
 
+                // rectangle fill is black, so the fades are called in reverse order
+
+
                 // Keep the screen dark for 30 seconds, then start the test
                 startTimer.schedule(
                         timerTask {
-                            this@rectangle.fill = Color.TRANSPARENT
-                            fadeIn.play()
+                            this@rectangle.opacity = 0.0
+                            targetFadeIn.play()
                             readyToStart = true
                             startTimer.cancel()
                             startTime = System.currentTimeMillis()
@@ -176,8 +196,9 @@ class TrainingWheels : View() {
                                 exitTest[i] = false
                             }
 
-                            // if the input fails the exit condition during the test, then trigger fail
-                            if (readyToStart) {
+                            // if the input fails the exit condition during the test when a fail can
+                            // be accepted, then trigger fail
+                            if (readyToStart && gameTarget.opacity == 1.0) {
                                 failAudio.seek(failAudio.startTime)
                                 failAudio.play()
                                 currentFailCount++
@@ -202,8 +223,6 @@ class TrainingWheels : View() {
                 }
             }.toBack()
         }
-
-        //fadeIn.play()
     }
 
     // This function either shrinks or moves the imageview around the screen
@@ -227,10 +246,9 @@ class TrainingWheels : View() {
 
     private fun callCSVWriter(imageView : ImageView) {
         val timeTillSuccess = System.currentTimeMillis() - startTime
-        println(timeTillSuccess)
         val stuff = arrayOf(
                 viewModel.testeeName.value,
-                viewModel.selectedIconPreview.value.impl_getUrl().replaceAfterLast("/", ""),
+                viewModel.selectedIconPreview.value.impl_getUrl().replaceBeforeLast("/", ""),
                 imageView.fitHeight.toString(),
                 imageView.fitHeight.toString(),
                 imageView.x.toString(),

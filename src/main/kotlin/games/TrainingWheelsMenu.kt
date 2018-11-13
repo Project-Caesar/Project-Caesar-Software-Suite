@@ -102,8 +102,6 @@ class TrainingWheelsMenu : View() {
                     }
 
                     imageview {
-                        // the imageview image will always be what is stored in the simple image property
-                        imageProperty().bind(viewModel.selectedIconPreview)
 
                         // basic image dimensions when one is selected
                         imageProperty().onChange {
@@ -115,6 +113,10 @@ class TrainingWheelsMenu : View() {
                                 fitWidth = (fitHeight / image.height) * image.width
                             }
                         }
+
+
+                        // the imageview image will always be what is stored in the simple image property
+                        imageProperty().bind(viewModel.selectedIconPreview)
                     }
                 }
 
@@ -145,6 +147,36 @@ class TrainingWheelsMenu : View() {
                             focusedProperty().onChange {
                                 if (!it) {
                                     text = viewModel.iconClicksToShrink.value.toString()
+                                }
+                            }
+                        }
+                    }
+
+                    vbox {
+                        label {
+                            text = "Delay Between Trials in Seconds"
+                        }
+
+                        textfield {
+                            alignment = Pos.CENTER_RIGHT
+                            text = "0"
+
+                            textProperty().onChange {
+                                if (it == null) {
+                                    viewModel.delayBetweenTrials.set(0)
+                                } else {
+                                    it.trim()
+                                    if (it.isInt() && it.toInt() >= 0) {
+                                        viewModel.delayBetweenTrials.set(it.toInt())
+                                    } else {
+                                        viewModel.delayBetweenTrials.set(0)
+                                    }
+                                }
+                            }
+
+                            focusedProperty().onChange {
+                                if (!it) {
+                                    text = viewModel.delayBetweenTrials.value.toString()
                                 }
                             }
                         }

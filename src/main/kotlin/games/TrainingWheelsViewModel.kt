@@ -4,9 +4,12 @@ import javafx.beans.property.*
 import javafx.scene.image.Image
 import javafx.scene.media.Media
 import tornadofx.*
-import java.io.File
 
 class TrainingWheelsViewModel : ViewModel() {
+
+    private val defaultIcon = Image("/Circle-icon.png")
+    private val defaultSuccessAudio = Media(TrainingWheelsViewModel::class.java.getResource("/correct.wav").toString())
+    private val defaultFailAudio = Media(TrainingWheelsViewModel::class.java.getResource("/incorrect.wav").toString())
 
     val csvHeaders = arrayOf(
             "Testee Name",
@@ -20,19 +23,22 @@ class TrainingWheelsViewModel : ViewModel() {
             "TimeStamp"
     )
 
+
     val testeeName = SimpleStringProperty()
 
-    val selectedIconPreview = SimpleObjectProperty<Image>()
+    val selectedIconPreview = SimpleObjectProperty<Image>(defaultIcon)
 
     val iconClicksToShrink = SimpleIntegerProperty(1)
     val iconShrinkLimit = SimpleDoubleProperty(.3)
     val iconStartSize = SimpleDoubleProperty(.9)
     val iconShrinkRatio = SimpleDoubleProperty(.9)
 
+    val delayBetweenTrials = SimpleIntegerProperty(0)
+
     val readyToStart = SimpleBooleanProperty(false)
 
-    val successAudio = SimpleObjectProperty<Media>()
-    val failAudio = SimpleObjectProperty<Media>()
+    val successAudio = SimpleObjectProperty<Media>(defaultSuccessAudio)
+    val failAudio = SimpleObjectProperty<Media>(defaultFailAudio)
 
     val dataFileDirectory = SimpleStringProperty(System.getProperty("user.dir") + "/TrainingWheelsLogs")
 
