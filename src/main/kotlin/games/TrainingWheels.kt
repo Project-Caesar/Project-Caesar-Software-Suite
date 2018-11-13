@@ -134,7 +134,7 @@ class TrainingWheels : View() {
                 // catch any touch or mouse clicked event on the imageview and call
                 // targetSelected when those events occur
                 addEventFilter(InputEvent.ANY) {
-                    if (it.eventType == MouseEvent.MOUSE_RELEASED && readyToStart && !isAudioPlaying()) {
+                    if (it.eventType == MouseEvent.MOUSE_RELEASED && readyToStart) {
                         if (this.opacity == 1.0) {
                             successAudio.play()
                             targetFadeOut.play()
