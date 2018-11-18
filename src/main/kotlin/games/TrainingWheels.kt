@@ -24,7 +24,7 @@ import kotlin.concurrent.timerTask
 class TrainingWheels : View() {
 
 
-    val viewModel : TrainingWheelsViewModel by inject()
+    private val viewModel : TrainingWheelsViewModel by inject()
 
     private lateinit var gameBackground : Rectangle
     private lateinit var gameTarget : ImageView
@@ -50,7 +50,7 @@ class TrainingWheels : View() {
         this.headerText = "End Training Wheels Test"
         this.contentText = "Select OK to end test or cancel to continue"
     }
-    private val exitTest = mutableListOf(false,false,false,false)
+    //private val exitTest = mutableListOf(false,false,false,false)
 
     private val csvWriter = CSV(
             viewModel.csvHeaders,
@@ -163,7 +163,7 @@ class TrainingWheels : View() {
                             startTimer.cancel()
                             startTime = System.currentTimeMillis()
                         },
-                        30000
+                        viewModel.delayAtStart.longValue()
                 )
 
                 // try mouse dragged entered and exit?
@@ -171,16 +171,20 @@ class TrainingWheels : View() {
                     // check and see if the point is close to a corner and set tht value as true
                     // in exitTest
                     if (it.sceneX < 50 && it.sceneY < 50) {
-                        exitTest[0] = true
+                        viewModel.passExitTestAt(0)
+                        //exitTest[0] = true
                         //println(0)
                     } else if (it.sceneX < 50 && it.sceneY > root.height - 50) {
-                        exitTest[1] = true
+                        viewModel.passExitTestAt(1)
+                        //exitTest[1] = true
                         //println(1)
                     } else if (it.sceneX > root.width - 50 && it.sceneY < 50) {
-                        exitTest[2] = true
+                        viewModel.passExitTestAt(2)
+                        //exitTest[2] = true
                         //println(2)
                     } else if (it.sceneX > root.width - 50 && it.sceneY > root.height - 50) {
-                        exitTest[3] = true
+                        viewModel.passExitTestAt(3)
+                        //exitTest[3] = true
                         //println(3)
                     }
                 }
@@ -191,10 +195,8 @@ class TrainingWheels : View() {
                     if ((it.eventType == MouseEvent.MOUSE_RELEASED || it.eventType == TouchEvent.TOUCH_RELEASED)) {
 
                         // Check if the input fails the exit condition
-                        if (exitTest.contains(false)) {
-                            for (i in 0 until exitTest.size) {
-                                exitTest[i] = false
-                            }
+                        if (!viewModel.checkExitTestPass()) {
+                            viewModel.resetExitTest()
 
                             // if the input fails the exit condition during the test when a fail can
                             // be accepted, then trigger fail
@@ -210,12 +212,10 @@ class TrainingWheels : View() {
                             val popupResult = exitDialog.showAndWait()
 
                             if (popupResult.get() == ButtonType.OK) {
-                                println("Exit Dialog Triggered")
+                                println("Test Exit Dialog Triggered")
                                 replaceWith(find<TrainingWheelsMenu>())
                             } else {
-                                for (i in 0 until exitTest.size) {
-                                    exitTest[i] = false
-                                }
+                                viewModel.resetExitTest()
                             }
                         }
                     }
@@ -276,5 +276,9 @@ class TrainingWheels : View() {
         return String.format("%02d:%02d:%02d.%d", hour, minute, second, millis)
     }
 
+    override fun onUndock() {
+        super.onUndock()
+    }
 }
+
 

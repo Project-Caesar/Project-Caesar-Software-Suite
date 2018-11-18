@@ -1,8 +1,12 @@
 package games
 
 import javafx.geometry.Pos
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
+import javafx.scene.input.InputEvent
 import javafx.scene.input.KeyCombination
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.VBox
 import javafx.stage.FileChooser
 import javafx.stage.Stage
@@ -41,6 +45,11 @@ class TrainingWheelsMenu : View() {
 
     private val directoryChooser = DirectoryChooser()
 
+    private val exitDialog = Alert(Alert.AlertType.CONFIRMATION).apply {
+        // set up exitDialog text
+        this.headerText = "End Project Caesar Program"
+        this.contentText = "Select OK to end program or cancel to continue"
+    }
 
 
     override val root = VBox()
@@ -230,6 +239,21 @@ class TrainingWheelsMenu : View() {
                 }
             }
 
+            hbox {
+                alignment = Pos.CENTER
+                label("Delay at Start?")
+                checkbox {
+                    fire()
+                    selectedProperty().onChange {
+                        if (it) {
+                            viewModel.delayAtStart.set(30000)
+                        } else {
+                            viewModel.delayAtStart.set(0)
+                        }
+                    }
+                }
+            }
+
             button("Select Folder to Save Data") {
                 setOnAction {
                     val selectedDirectory = directoryChooser.showDialog(null)
@@ -250,6 +274,36 @@ class TrainingWheelsMenu : View() {
             }
 
             this += VirtualKeyboard().view()
+
+
+            setOnMouseDragged {
+                // check and see if the point is close to a corner and set tht value as true
+                // in exitTest
+                if (it.sceneX < 50 && it.sceneY < 50) {
+                    viewModel.passExitTestAt(0)
+                } else if (it.sceneX < 50 && it.sceneY > root.height - 50) {
+                    viewModel.passExitTestAt(1)
+                } else if (it.sceneX > root.width - 50 && it.sceneY < 50) {
+                    viewModel.passExitTestAt(2)
+                } else if (it.sceneX > root.width - 50 && it.sceneY > root.height - 50) {
+                    viewModel.passExitTestAt(3)
+                }
+            }
+
+            addEventFilter(InputEvent.ANY) {
+                if (it.eventType == MouseEvent.MOUSE_RELEASED) {
+                    if (viewModel.checkExitTestPass()) {
+
+                        if (exitDialog.showAndWait().get() == ButtonType.OK) {
+                            println("Menu Exit Dialog Triggered")
+                            System.exit(0)
+                        } else {
+                            viewModel.resetExitTest()
+                        }
+                    }
+                }
+            }
         }
     }
+
 }

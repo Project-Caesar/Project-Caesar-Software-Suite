@@ -33,6 +33,8 @@ class TrainingWheelsViewModel : ViewModel() {
     val iconStartSize = SimpleDoubleProperty(.9)
     val iconShrinkRatio = SimpleDoubleProperty(.9)
 
+    val delayAtStart = SimpleIntegerProperty(30000)
+
     val delayBetweenTrials = SimpleIntegerProperty(0)
 
     val readyToStart = SimpleBooleanProperty(false)
@@ -41,6 +43,8 @@ class TrainingWheelsViewModel : ViewModel() {
     val failAudio = SimpleObjectProperty<Media>(defaultFailAudio)
 
     val dataFileDirectory = SimpleStringProperty(System.getProperty("user.dir") + "/TrainingWheelsLogs")
+
+    private val exitTest = mutableListOf(false,false,false,false)
 
     init {
 
@@ -72,5 +76,19 @@ class TrainingWheelsViewModel : ViewModel() {
     private fun checkIfReady() : Boolean {
         return !(testeeName.value == "" || testeeName.value == null || selectedIconPreview.value == null
                 || successAudio.value == null || failAudio.value == null || iconStartSize.value < iconShrinkLimit.value)
+    }
+
+    fun resetExitTest() {
+        for (i in 0 until exitTest.size) {
+            exitTest[i] = false
+        }
+    }
+
+    fun passExitTestAt(pos : Int) {
+        exitTest[pos] = true
+    }
+
+    fun checkExitTestPass() : Boolean {
+        return !exitTest.contains(false)
     }
 }
