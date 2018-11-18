@@ -11,7 +11,6 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.input.TouchEvent
 import javafx.scene.layout.Pane
 import javafx.scene.media.AudioClip
-import javafx.scene.media.MediaPlayer
 import javafx.scene.shape.Rectangle
 import java.util.concurrent.ThreadLocalRandom
 import tornadofx.*
@@ -84,7 +83,7 @@ class TrainingWheels : View() {
                     targetSelected(targetFadeOut.node as ImageView)
 
                     // triggers the arduino to release a pellet for the subject
-                    callArduino(pid_num)
+                    callArduino(viewModel.pid_num)
 
                     successCount++
                     // call the csv writer
@@ -276,9 +275,6 @@ class TrainingWheels : View() {
         return String.format("%02d:%02d:%02d.%d", hour, minute, second, millis)
     }
 
-    override fun onUndock() {
-        super.onUndock()
-    }
 }
 
 

@@ -16,15 +16,6 @@ import usecases.VirtualKeyboard
 import javafx.scene.media.Media
 import javafx.stage.DirectoryChooser
 
-var pid_num = ""
-
-// main and app used to test the menu
-// will be removed when menu is complete
-fun main(args: Array<String>) {
-    pid_num = args[0]
-    launch<TrainingWheelsApp>(args)
-}
-
 // create app class; contains main starting view and any stylesheets (not used here)
 class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
 
@@ -40,7 +31,7 @@ class TrainingWheelsApp : App(TrainingWheelsMenu::class) {
 class TrainingWheelsMenu : View() {
 
     private val trainingWheelsScope = Scope()
-    private val viewModel = TrainingWheelsViewModel()
+    private val viewModel = TrainingWheelsViewModel(app.parameters.raw[0])
 
     // used to select an icon file from a directory
     private val imageFileChooser = FileChooser()
@@ -58,7 +49,6 @@ class TrainingWheelsMenu : View() {
     override val root = VBox()
 
     init {
-
         setInScope(viewModel, trainingWheelsScope)
 
         with(root) {

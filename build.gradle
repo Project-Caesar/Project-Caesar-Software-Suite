@@ -6,7 +6,7 @@ plugins {
 
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': 'games.MainKt'
+        attributes 'Main-Class': 'MainKt'
     }
 
     baseName = project.name + '-all_2'

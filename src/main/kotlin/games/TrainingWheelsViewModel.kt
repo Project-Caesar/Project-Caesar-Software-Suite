@@ -5,7 +5,7 @@ import javafx.scene.image.Image
 import javafx.scene.media.Media
 import tornadofx.*
 
-class TrainingWheelsViewModel : ViewModel() {
+class TrainingWheelsViewModel(val pid_num : String) : ViewModel() {
 
     private val defaultIcon = Image("/Circle-icon.png")
     val defaultSuccessAudio = Media(TrainingWheelsViewModel::class.java.getResource("/correct.wav").toString())
