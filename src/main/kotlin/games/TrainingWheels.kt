@@ -199,8 +199,8 @@ class TrainingWheels : View() {
 
                             // if the input fails the exit condition during the test when a fail can
                             // be accepted, then trigger fail
-                            if (readyToStart && gameTarget.opacity == 1.0 && !isAudioPlaying()) {
-                                failAudio.play()
+                            if (readyToStart && gameTarget.opacity == 1.0) {
+                                if (viewModel.useFailAuidio.value && !isAudioPlaying()) failAudio.play()
                                 currentFailCount++
                             }
 

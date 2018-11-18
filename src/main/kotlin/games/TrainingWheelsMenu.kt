@@ -201,6 +201,15 @@ class TrainingWheelsMenu : View() {
             }
 
             hbox {
+                alignment = Pos.CENTER
+                label("Use Fail Audio?")
+                checkbox {
+                    viewModel.useFailAuidio.bind(selectedProperty())
+                }
+            }
+
+
+            hbox {
 
                 alignment = Pos.CENTER
 
@@ -222,7 +231,7 @@ class TrainingWheelsMenu : View() {
                 }
 
                 button (" Select Fail Audio "){
-
+                    disableProperty().bind(!viewModel.useFailAuidio)
                     setOnAction {
                         val file = audioFileChooser.showOpenDialog(null)
                         if (file != null) {
