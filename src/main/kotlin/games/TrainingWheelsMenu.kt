@@ -16,9 +16,12 @@ import usecases.VirtualKeyboard
 import javafx.scene.media.Media
 import javafx.stage.DirectoryChooser
 
+var pid_num = ""
+
 // main and app used to test the menu
 // will be removed when menu is complete
 fun main(args: Array<String>) {
+    pid_num = args[0]
     launch<TrainingWheelsApp>(args)
 }
 
