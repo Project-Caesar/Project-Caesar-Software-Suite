@@ -83,7 +83,8 @@ class TrainingWheels : View() {
                     targetSelected(targetFadeOut.node as ImageView)
 
                     // triggers the arduino to release a pellet for the subject
-                    callArduino(viewModel.pid_num)
+                    //callArduino(viewModel.pid_num)
+                    callArduino("Caeser")
 
                     successCount++
                     // call the csv writer
