@@ -98,7 +98,9 @@ class TrainingWheelsMenu : View() {
 
                             val file = imageFileChooser.showOpenDialog(null)
                             if (file != null) {
-                                viewModel.selectedIconPreview.value = Image(file.toURI().toString())
+                                val imageURL = file.toURI().toString()
+                                viewModel.selectedIconPreview.value = Image(imageURL)
+                                viewModel.selectedIconName.value = imageURL.replaceBeforeLast("/", "")
                             }
                         }
                     }

@@ -32,6 +32,7 @@ class TrainingWheelsViewModel(val pid_num : String) : ViewModel() {
     val testeeName = SimpleStringProperty()
 
     val selectedIconPreview = SimpleObjectProperty<Image>(defaultIcon)
+    val selectedIconName = SimpleStringProperty("/Circle-icon.png")
 
     val iconClicksToShrink = SimpleIntegerProperty(1)
     val iconShrinkLimit = SimpleDoubleProperty(.3)

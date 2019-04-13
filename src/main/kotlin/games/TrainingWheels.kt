@@ -251,7 +251,7 @@ class TrainingWheels : View() {
         val timeTillSuccess = System.currentTimeMillis() - startTime
         val stuff = arrayOf(
                 viewModel.testeeName.value,
-                viewModel.selectedIconPreview.value.impl_getUrl().replaceBeforeLast("/", ""),
+                viewModel.selectedIconName.value,
                 imageView.fitHeight.toString(),
                 imageView.fitHeight.toString(),
                 imageView.x.toString(),
